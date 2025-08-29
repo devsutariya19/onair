@@ -5,6 +5,12 @@ import {columns } from '@/app/dashboard/columns'
 import React from 'react'
 import Link from 'next/link'
 import CreateSession from '@/app/dashboard/create-session'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: "Dashboard | OnAir Timer",
+  description: "OnAir Timer - A simple timer application"
+};
 
 export default function Dashboard() {
   const initialSessions = [
@@ -16,7 +22,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className='flex justify-between items-center border py-4 mb-8 bg-transparent rounded-none border-transparent border-b-zinc-800'>
+      <div className='flex justify-between items-center border py-5 mb-9 bg-transparent rounded-none border-transparent border-b-zinc-800'>
         <Link href="/" className="text-2xl font-bold text-teal-400 flex items-center gap-2">
           <ChartNoAxesGantt className="bg-teal-500 text-white rounded-full p-1" />
           OnAir Timer

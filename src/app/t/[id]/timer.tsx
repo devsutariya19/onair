@@ -1,10 +1,10 @@
 'use client';
 
+import LocalTime from "@/components/local-time";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { formatTime } from "@/lib/utils";
-import { ChartNoAxesGantt, Circle, Clock, Wifi, WifiOff } from "lucide-react";
-import Link from "next/link";
+import { ChartNoAxesGantt, Circle, Wifi, WifiOff } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function TimerView ({ initialData }: { initialData: any }) {
@@ -14,7 +14,6 @@ export function TimerView ({ initialData }: { initialData: any }) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
   const [activeQueueId, setActiveQueueId] = useState(3);
-  const [currentLocalTime, setCurrentLocalTime] = useState('');
   const [hostMessage, setHostMessage] = useState('');
 
   useEffect(() => {
@@ -26,24 +25,6 @@ export function TimerView ({ initialData }: { initialData: any }) {
     }
     return () => clearInterval(timerInterval);
   }, [isPlaying, isConnected]);
-
-  useEffect(() => {
-    setCurrentLocalTime(new Date().toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit'
-    }));
-    
-    const clockInterval = setInterval(() => {
-      setCurrentLocalTime(new Date().toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        second: '2-digit'
-      }));
-    }, 1000);
-    
-    return () => clearInterval(clockInterval);
-  }, []);
 
   useEffect(() => {
     const messageTimer = setTimeout(() => {
@@ -92,12 +73,7 @@ export function TimerView ({ initialData }: { initialData: any }) {
           OnAir Timer
         </div>
         <div className="flex items-center gap-4">
-          {currentLocalTime && (
-            <div className="flex items-center gap-2 text-zinc-400">
-              <Clock size={18} />
-              <span className="font-mono text-lg">{currentLocalTime}</span>
-            </div>
-          )}
+          <LocalTime/>
           <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${isConnected ? 'bg-teal-500/10 text-teal-400' : 'bg-red-500/10 text-red-400'}`}
             title={isConnected ? 'Connected to host' : 'Connection lost'}
           >
@@ -107,13 +83,24 @@ export function TimerView ({ initialData }: { initialData: any }) {
         </div>
       </div>
 
-      <Card className="flex flex-col items-center justify-center flex-grow p-8">
-        <h2 className="text-xl sm:text-2xl text-zinc-400 mb-2">{activeItem?.name || 'Timer Finished'}</h2>
-        <div className="font-mono text-7xl sm:text-8xl md:text-9xl font-bold tracking-tighter text-white my-5 md:my-10">
-          {formatTime(currentTime)}
+      <Card className="flex flex-col items-center justify-center flex-grow p-8 transition-all duration-500 ease-in-out bg-zinc-950 border-teal-600">
+        <div className={`flex flex-col items-center justify-center gap-4 text-center transition-all duration-500 ease-in-out ${hostMessage ? 'opacity-70' : 'opacity-100'}`}>
+            <h2 className={`transition-all duration-500 ${hostMessage ? 'text-lg' : 'text-xl sm:text-2xl'} text-zinc-400`}>
+              {activeItem?.name || 'Timer Finished'}
+            </h2>
+            <div className={`font-mono font-bold tracking-tighter text-white transition-all duration-500 ${hostMessage ? 'text-7xl' : 'text-7xl sm:text-8xl md:text-9xl md:my-10'}`}>
+              {formatTime(currentTime)}
+            </div>
+            <div className={`px-4 py-1.5 rounded-full font-semibold transition-all duration-500 ${isPlaying ? 'bg-teal-500/10 text-teal-300' : 'bg-yellow-500/10 text-yellow-300'} ${hostMessage ? 'text-sm' : 'text-lg'}`}>
+              {isPlaying ? activeItem?.speaker : 'PAUSED'}
+            </div>
         </div>
-        <div className={`mt-4 px-4 py-1.5 rounded-full lg:text-lg ${isPlaying ? 'bg-teal-500/10 text-teal-300' : 'bg-yellow-500/10 text-yellow-300'}`}>
-          {isPlaying ? activeItem?.speaker : 'PAUSED'}
+
+        <div className={`transition-all duration-500 ease-in-out overflow-hidden w-full ${hostMessage ? 'max-h-96 mt-10 pt-12 border-t border-zinc-700' : 'max-h-0 mt-0 pt-0 border-t border-transparent'}`}>
+          <div className="flex flex-col gap-4 items-center text-center">
+            <h3 className="text-2xl font-bold text-teal-300 mb-1">Message from Host</h3>
+            <p className="text-5xl text-zinc-200 max-w-full">{hostMessage}</p>
+          </div>
         </div>
       </Card>
 

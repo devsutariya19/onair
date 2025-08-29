@@ -61,7 +61,6 @@ export default function CreateSession() {
   }, 0);
 
   return (
-    // reset all of the input and lists. do that in a function
     <Dialog onOpenChange={() => resetQueue()}>
       <form>
         <DialogTrigger asChild>
