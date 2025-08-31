@@ -5,36 +5,65 @@ import { Metadata } from 'next';
 import React from 'react'
 import HostDashboard from '@/app/t/[id]/controller/host-dashboard';
 import Link from 'next/link';
+import { Cue, Devices, Messages } from '@/lib/model';
+import { createClient } from '@/utils/supabase/server';
 
 export const metadata: Metadata = {
   title: "Controller | OnAir Timer",
   description: "OnAir Timer - A simple timer application"
 };
 
-export default async function Controller({ params }: { params: Promise<{ id: string }>} ) {
+export default async function Controller({ params }: { params: Promise<{ id: string }>}) {
   const { id } = await params;
   const timerId = id;
 
-  const initialRundown: any[] = [
-    { id: 1, title: 'Welcome & Introduction', speaker: 'Host', duration: 300, status: 'active' },
-    { id: 2, title: 'Keynote Speech', speaker: 'Jane Doe', duration: 2700, status: 'upcoming' },
-    { id: 3, title: 'Q&A Session', speaker: 'Panel', duration: 900, status: 'upcoming' },
-    { id: 4, title: 'Closing Remarks', speaker: 'Host', duration: 180, status: 'upcoming' },
-    { id: 5, title: 'Networking', speaker: 'All', duration: 1800, status: 'upcoming' },
-  ];
+  const supabase = await createClient();
 
-  const initialMessages: any[] = [
-    { id: 1, text: 'Please wrap up' },
-    { id: 2, text: '5 minutes remaining' },
-    { id: 3, text: 'Next section starting soon' },
-  ];
+  const {data: cue_data} = await supabase
+    .from('cues')
+    .select('*')
+    .eq('session_id', timerId)
+    .overrideTypes<Cue[]>();
 
-  const mockDevices = [
-    { id: 1, name: 'Host Laptop' },
-    { id: 2, name: 'Front of House iPad' },
-    { id: 3, name: 'Stage Phone' },
-    { id: 4, name: 'Tech Booth Mac' },
-  ];
+  let cues: Cue[] = cue_data!;
+
+  const hasActiveCue = cues.some(cue => cue.status === 'active');
+  if (!hasActiveCue && cues.length > 0) {
+    const firstCue = cues.find(cue => cue.order === 1);
+
+    console.log(`No active cue found. Activating '${firstCue?.title}'...`);
+
+    await supabase
+    .from('cues')
+    .update({ status: 'active'})
+    .eq('id', firstCue?.id)
+    .then(async () => {
+      const {data} = await supabase
+        .from('cues')
+        .select('*')
+        .eq('session_id', timerId)
+        .overrideTypes<Cue[]>();
+      cues = data!;
+    })
+  }
+
+  console.log(cues);
+
+  const {data: devices_data} = await supabase
+    .from('devices')
+    .select('*')
+    .eq('session_id', timerId)
+    .overrideTypes<Devices[]>();
+
+  let devices: Devices[] = devices_data!;
+
+  const {data: messages_data} = await supabase
+    .from('messages')
+    .select('*')
+    .eq('session_id', timerId)
+    .overrideTypes<Messages[]>();
+
+  let messages: Messages[] = messages_data!;
 
   return (
     <div className="flex flex-col h-screen">
@@ -57,9 +86,9 @@ export default async function Controller({ params }: { params: Promise<{ id: str
       </div>
       
       <HostDashboard
-        initialRundown={initialRundown}
-        initialMessages={initialMessages}
-        mockDevices={mockDevices}
+        cues={cues}
+        messages={messages}
+        devices={devices}
         timerId={timerId}
       />
     </div>

@@ -4,7 +4,7 @@ import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Timer } from "lucide-react";
-import { Session } from "@/app/dashboard/columns";
+import { Session } from "@/lib/model";
 
 export function DataTable({ columns, data }: { columns: ColumnDef<Session>[]; data: Session[] }) {
   const table = useReactTable({

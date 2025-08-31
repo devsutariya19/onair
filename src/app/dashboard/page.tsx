@@ -6,20 +6,23 @@ import React from 'react'
 import Link from 'next/link'
 import CreateSession from '@/app/dashboard/create-session'
 import { Metadata } from 'next'
+import { Session } from '@/lib/model'
+import { createClient } from '@/utils/supabase/server'
 
 export const metadata: Metadata = {
   title: "Dashboard | OnAir Timer",
   description: "OnAir Timer - A simple timer application"
 };
 
-export default function Dashboard() {
-  const initialSessions = [
-    { id: 'xyz-123', title: 'Weekly Team Sync', segments: '10', totalDuration: '45m', lastModified: '2025-08-17T10:30:00Z' },
-    { id: 'abc-789', title: 'Client Presentation Rehearsal', segments: '5', totalDuration: '1h 15m', lastModified: '2025-08-14T14:00:00Z' },
-    { id: 'def-456', title: 'Q3 All-Hands Meeting', segments: '8', totalDuration: '2h 30m', lastModified: '2025-08-12T09:00:00Z' },
-    { id: 'ghi-012', title: 'Workshop on New Features', segments: '3', totalDuration: '30m', lastModified: '2025-08-05T11:45:00Z' },
-  ];
+export default async function Dashboard() {
+  const supabase = await createClient();
+  const {data} = await supabase
+    .from('sessions')
+    .select('*')
+    .overrideTypes<Session[]>();
 
+  const sessions: Session[] = data!;
+  
   return (
     <div>
       <div className='flex justify-between items-center border py-5 mb-9 bg-transparent rounded-none border-transparent border-b-zinc-800'>
@@ -43,7 +46,7 @@ export default function Dashboard() {
       </div>
 
       <div className='sm:mx-8'>
-        <DataTable columns={columns} data={initialSessions} />
+        <DataTable columns={columns} data={sessions} />
       </div>
     </div>
   )

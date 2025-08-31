@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx"
+import { format } from "path";
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -36,3 +37,9 @@ export const formatTotalTime = (seconds: any) => {
 };
 
 export const formatMinutes = (seconds: number) => `${Math.floor(seconds / 60)} min`;
+
+export const formatDate = (dateString: any) => {
+  const dateObject = new Date(dateString);
+  const formattedDateTime = dateObject.toLocaleString();
+  return formattedDateTime;
+};

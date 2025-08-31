@@ -9,18 +9,18 @@ import { useEffect, useState } from "react";
 
 export function TimerView ({ initialData }: { initialData: any }) {
   const { queue } = initialData;
-  
-  const [currentTime, setCurrentTime] = useState(588); 
+
+  const [currentTime, setCurrentTime] = useState(initialData.queue[0].duration);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
-  const [activeQueueId, setActiveQueueId] = useState(3);
+  const [activeQueueId, setActiveQueueId] = useState(1);
   const [hostMessage, setHostMessage] = useState('');
 
   useEffect(() => {
     let timerInterval: any;
     if (isPlaying && isConnected) {
       timerInterval = setInterval(() => {
-        setCurrentTime(prev => (prev > 0 ? prev - 1 : 0));
+        setCurrentTime((prev: number) => (prev > 0 ? prev - 1 : 0));
       }, 1000);
     }
     return () => clearInterval(timerInterval);

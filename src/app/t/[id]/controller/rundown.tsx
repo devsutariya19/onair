@@ -1,16 +1,14 @@
 'use client'
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { EllipsisVertical, GripVertical, Play, Trash2 } from 'lucide-react';
+import { EllipsisVertical, GripVertical, Play } from 'lucide-react';
 import { Label } from '@/components/ui/label'
 import React, { useState } from 'react'
 import { formatTime } from '@/lib/utils';
+import { Cue } from '@/lib/model';
 
-
-
-export default function Rundown({ initialRundown }: { initialRundown: any[] }) {
-  const [queue, setQueue] = useState<any[]>(initialRundown);
+export default function Rundown({ rundown, activeCue }: { rundown: Cue[], activeCue: Cue }) {
+  const [queue, setQueue] = useState<any[]>(rundown);
   const [draggedItemIndex, setDraggedItemIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
 
@@ -48,11 +46,11 @@ export default function Rundown({ initialRundown }: { initialRundown: any[] }) {
 
   return (
     <div className="space-y-1 overflow-y-auto p-2 border-t border-b border-zinc-700" onDragLeave={handleDragLeave} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
-      {queue.map((item: any, index: any) => {
+      {queue.map((item: Cue, index: any) => {
         const isDraggingOver = dragOverIndex === index;
         const isDragged = draggedItemIndex === index;
         return (
-          <div key={item.id} className={`relative transition-all duration-200 ${isDraggingOver ? 'pt-10' : 'pt-0'}`}
+          <div key={item.id} className={`relative transition-all duration-200 ${isDraggingOver ? 'pt-10' : 'pt-0'} ${item.id === activeCue.id ? 'bg-teal-500/10 border-l-4 border-teal-500' : 'bg-zinc-700/50'} ${item.status === 'completed' ? 'opacity-50' : ''} rounded-md mb-1`}
             onDragOver={(e) => handleDragOver(e, index)}
           >
             {isDraggingOver && <div className="absolute top-2 left-0 w-full h-1 bg-teal-500 rounded-full"></div>}
