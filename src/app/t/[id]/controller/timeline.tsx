@@ -7,8 +7,8 @@ import React, { useState } from 'react'
 import { formatTime } from '@/lib/utils';
 import { Cue } from '@/lib/model';
 
-export default function Rundown({ rundown, activeCue }: { rundown: Cue[], activeCue: Cue }) {
-  const [queue, setQueue] = useState<any[]>(rundown);
+export default function Timeline({ timeline, activeCue, onPlay }: { timeline: Cue[], activeCue: Cue, onPlay: (id: string) => void }) {
+  const [queue, setQueue] = useState<any[]>(timeline);
   const [draggedItemIndex, setDraggedItemIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
 
@@ -60,7 +60,7 @@ export default function Rundown({ rundown, activeCue }: { rundown: Cue[], active
               </div>
               <Label className="w-15 mx-3 sm:mx-5">{formatTime(item.duration)}</Label>
               <Label className="flex flex-grow justify-start sm:justify-evenly text-sm sm:text-md mx-2 overflow-hidden"><p className='truncate'>{item.title}</p></Label>
-              <Button variant="ghost" className="text-zinc-500 hover:text-teal-400 transition-colors"><Play size={16} /></Button>
+              <Button variant="ghost" className="text-zinc-500 hover:text-teal-400 transition-colors" onClick={() => onPlay(item.id)}><Play size={16}/></Button>
               <Button variant="ghost" className="text-zinc-500 hover:text-teal-400 transition-colors"><EllipsisVertical size={16} /></Button>
             </div>
           </div>

@@ -4,20 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatTime, formatTotalTime } from '@/lib/utils';
 import { SkipBack, Play, Pause, SkipForward, Users } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react'
-import Rundown from '@/app/t/[id]/controller/rundown';
+import React, { useEffect, useState } from 'react'
+import Timeline from '@/app/t/[id]/controller/timeline';
 import { Label } from '@/components/ui/label';
 import { Cue, Devices, Messages } from '@/lib/model';
 import { createClient } from '@/utils/supabase/client';
+import { Progress } from '@/components/ui/progress';
 
 export default function HostDashboard({ cues, messages, timerId, devices }: { cues: Cue[], messages: Messages[], timerId: string, devices: Devices[] }) {
-  const [rundown, setRundown] = useState<Cue[]>(cues.sort((a, b) => a.order - b.order));
-  const [presetMessages, setPresetMessages] = useState<Messages[]>(messages);
+  const [timeline, setTimeline] = useState<Cue[]>(cues.sort((a, b) => a.order - b.order));
 
   const [hostMessage, setHostMessage] = useState<string>('');
   const [screenState, setScreenState] = useState<'normal' | 'flashing' | 'blackout'>('normal');
   
-  const active: Cue = rundown.find(c => c.status === 'active')!;
+  const active: Cue = timeline.find(c => c.status === 'active') || timeline[0];
   const [activeCue, setActiveCue] = useState<Cue>(active);
   const [isPlaying, setIsPlaying] = useState<boolean>(active.is_playing || false);
   const [currentTime, setCurrentTime] = useState<number>(active.remaining_time || 0);
@@ -41,9 +41,10 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
           type: 'broadcast',
           event: 'update',
           payload: {
-            cue_id: activeCue.id,
-            currentTime: newTime,
-            is_playing: isPlaying
+            cueId: activeCue.id,
+            remainingTime: newTime,
+            isPlaying: isPlaying,
+            message: hostMessage,
           }
         });
 
@@ -55,7 +56,7 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
       clearInterval(interval);
       channel.unsubscribe();
     };
-  }, [isPlaying, activeCue]);
+  }, [isPlaying, activeCue, hostMessage]);
 
   const togglePlayPause = async () => {
     if (!activeCue) return;
@@ -67,42 +68,69 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
 
     setIsPlaying(!isPlaying);
     setActiveCue({ ...activeCue, is_playing: !isPlaying });
+
+    channel.send({
+      type: 'broadcast',
+      event: 'update',
+      payload: {
+        cueId: activeCue.id,
+        remainingTime: currentTime,
+        isPlaying: !isPlaying
+      }
+    });
   };
 
-  const handleNextCue = useCallback(async () => {
-    const currentIndex = rundown.findIndex(c => c.status === 'active');
-    if (currentIndex > -1 && currentIndex < rundown.length - 1) {
-      const currentCue = rundown[currentIndex];
-      const nextCue = rundown[currentIndex + 1];
+  const handlePlay = async (id: string) => {
+    console.log("Playing cue:", id);
+    const nextCue = timeline.find(c => c.id === id)!;
+    await supabase
+      .from('cues')
+      .update({ is_playing: true, status: 'active' })
+      .eq('id', id);
 
+    await supabase
+      .from('cues')
+      .update({ is_playing: false, status: 'queued', remaining_time: activeCue.duration })
+      .eq('id', activeCue.id);
+
+    setIsPlaying(true);
+    setCurrentTime(nextCue.duration);
+    setActiveCue({ ...nextCue, is_playing: true, status: 'active' });
+  }
+
+  const handleNextCue = async () => {
+    const nextCue = timeline.find(c => c.order === activeCue.order + 1);
+    console.log(nextCue);
+
+    if (nextCue) {
       await supabase.from('cues').upsert([
-        { ...currentCue, status: 'finished', remaining_time: 0, is_playing: false },
+        { ...activeCue, status: 'finished', remaining_time: activeCue.duration, is_playing: false },
         { ...nextCue, status: 'active', is_playing: true }
       ]);
 
-      setActiveCue(nextCue);
-      setCurrentTime(nextCue.duration);
+      setActiveCue({ ...nextCue, is_playing: true, status: 'active' });
+      setCurrentTime(nextCue.remaining_time);
     }
-  }, [rundown]);
+  };
 
-  const handlePreviousCue = useCallback(async () => {
-    const currentIndex = rundown.findIndex(c => c.status === 'active');
-    if (currentIndex > 0) {
-      const currentCue = rundown[currentIndex];
-      const prevCue = rundown[currentIndex - 1];
+  const handlePreviousCue = async () => {
+    const prevCue = timeline.find(c => c.order === activeCue.order - 1);
+    console.log(prevCue);
 
+    if (prevCue) {
       await supabase.from('cues').upsert([
-        { ...currentCue, status: 'upcoming' },
-        { ...prevCue, status: 'active', is_playing: false }
+        { ...activeCue, status: 'queued', remaining_time: activeCue.duration, is_playing: false },
+        { ...prevCue, status: 'active', is_playing: true }
       ]);
 
-      setActiveCue(prevCue);
-      setCurrentTime(prevCue.duration);
+      setActiveCue({ ...prevCue, is_playing: true, status: 'active' });
+      setCurrentTime(prevCue.remaining_time);
     }
-  }, [rundown]);
+  };
 
   const adjustTime = async (seconds: number) => {
     if (!activeCue) return;
+    // cap out at the activeCue.duration allocated
     const newTime = Math.max(0, currentTime + seconds);
     await supabase
       .from('cues')
@@ -111,9 +139,6 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
 
     setCurrentTime(newTime);
   };
-
-  const totalDuration = activeCue ? activeCue.duration : 0;
-  const progress = totalDuration > 0 ? ((totalDuration - currentTime) / totalDuration) * 100 : 0;
 
   return (
     <div className="flex-grow grid grid-cols-1 lg:grid-cols-4 gap-6 py-6 overflow-y-auto">
@@ -129,8 +154,8 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
               </div>
               <div className={`transition-all duration-500 ease-in-out overflow-hidden w-full ${hostMessage ? 'max-h-[30rem] mt-4 pt-4 border-t border-zinc-700' : 'max-h-0 mt-0 pt-0 border-t border-transparent'}`}>
                 <div className="flex flex-col gap-2 items-center text-center">
-                  <h3 className="text-lg font-bold text-teal-300 flash-invert">{hostMessage ? 'Message from Host' : ''}</h3>
-                  <p className="text-xl text-zinc-200 max-w-full flash-invert">{hostMessage}</p>
+                  <h3 className="sm:text-lg font-bold text-teal-300 flash-invert">{hostMessage ? 'Message from Host' : ''}</h3>
+                  <p className="sm:text-xl text-zinc-200 max-w-full flash-invert">{hostMessage}</p>
                 </div>
               </div>
             </div>
@@ -143,15 +168,15 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
                 <p className="text-lg sm:text-xl font-bold truncate">{activeCue?.title || 'Timer Paused'}</p>
                 <p className="text-4xl sm:text-6xl font-black text-teal-400 my-1">{formatTime(currentTime)}</p>
                 <div className="w-full bg-zinc-700 rounded-full h-2 mt-2">
-                  <div className="bg-teal-400 h-2 rounded-full" style={{ width: `${progress}%`, transition: 'width 0.5s linear' }}></div>
+                  <Progress value={Math.min(((activeCue.duration - currentTime) / activeCue.duration) * 100, 100)} max={100} color="bg-teal-500" />
                 </div>
               </div>
               <div className="flex items-center justify-center gap-2 md:gap-4 mt-5">
                 <Button variant="ghost" size="sm" onClick={() => adjustTime(-60)}><span className='text-xs'>-1m</span></Button>
                 <Button variant="ghost" size="sm" onClick={() => adjustTime(-30)}><span className='text-xs'>-30s</span></Button>
                 <Button variant="ghost" size="sm" onClick={handlePreviousCue}><SkipBack /></Button>
-                <Button size="lg" className={`w-10 h-10 text-2xl text-white ${activeCue?.is_playing ? 'bg-amber-500 hover:bg-amber-600' : 'bg-teal-500 hover:bg-teal-600'}`} onClick={() => togglePlayPause()}>
-                  {activeCue?.is_playing ? <Pause /> : <Play />}
+                <Button size="lg" className={`w-10 h-10 text-2xl text-white ${isPlaying ? 'bg-amber-500 hover:bg-amber-600' : 'bg-teal-500 hover:bg-teal-600'}`} onClick={() => togglePlayPause()}>
+                  {isPlaying ? <Pause /> : <Play />}
                 </Button>
                 <Button variant="ghost" size="sm" onClick={handleNextCue}><SkipForward /></Button>
                 <Button variant="ghost" size="sm" onClick={() => adjustTime(30)}><span className='text-xs'>+30s</span></Button>
@@ -163,12 +188,12 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
 
         <Card className="bg-zinc-900/70 border-zinc-700 text-white flex-grow flex flex-col">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Rundown</CardTitle>
-            <Label className="text-xs text-zinc-400">{rundown.length} items | {formatTotalTime(rundown.reduce((acc, item) => acc + item.duration, 0))}</Label>
+            <CardTitle>Timeline</CardTitle>
+            <Label className="text-xs text-zinc-400">{timeline.length} items | {formatTotalTime(timeline.reduce((acc, item) => acc + item.duration, 0))}</Label>
           </CardHeader>
           <CardContent className="flex-grow overflow-y-auto">
             <div className="space-y-1">
-              <Rundown rundown={rundown} activeCue={activeCue} />
+              <Timeline timeline={timeline} activeCue={activeCue} onPlay={handlePlay}/>
             </div>
           </CardContent>
         </Card>

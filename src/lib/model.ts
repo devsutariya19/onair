@@ -1,11 +1,11 @@
 export type Cue = {
-  id: number;
-  session_id: string
+  id: string;
+  session_id: string;
   title: string;
   speaker: string;
   duration: number;
   remaining_time: number;
-  status: 'active' | 'upcoming' | 'completed';
+  status: 'active' | 'queued' | 'completed';
   is_playing: boolean;
   order: number;
   created_at: string;
