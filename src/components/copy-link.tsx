@@ -4,13 +4,13 @@ import { Check, Copy, Link } from 'lucide-react';
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button';
 
-export default function CopyLink({ timerId, icon = true }: { timerId: string, icon?: boolean }) {
+export default function CopyLink({ sessionId, icon = true }: { sessionId: string, icon?: boolean }) {
 
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     const baseUrl = window.location.origin;
-    const shareLink = `${baseUrl}/t/${timerId}`;
+    const shareLink = `${baseUrl}/t/${sessionId}`;
     navigator.clipboard.writeText(shareLink).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);

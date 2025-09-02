@@ -37,8 +37,6 @@ export async function createSession(sessionTitle: string, cues: NewCue[], durati
         }))
       ).select('*')
 
-    console.log(cuesData);
-
     if (cueError) {
       return { success: false, message: `Failed to insert cues: ${cueError.message}` };
     }

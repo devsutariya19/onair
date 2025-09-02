@@ -11,13 +11,13 @@ export const metadata: Metadata = {
 
 export default async function TimerPage({ params }: { params: Promise<{ id: string }>}) {
   const { id } = await params;
-  const timerId = id;
+  const sessionId = id;
 
   const supabase = await createClient();
   const {data} = await supabase
     .from('cues')
     .select('*')
-    .eq('session_id', timerId)
+    .eq('session_id', sessionId)
     .order('order', { ascending: true })
     .overrideTypes<Cue[]>();
 
@@ -26,14 +26,14 @@ export default async function TimerPage({ params }: { params: Promise<{ id: stri
   const {data: devices_data} = await supabase
     .from('devices')
     .select('*')
-    .eq('session_id', timerId)
+    .eq('session_id', sessionId)
     .overrideTypes<Devices[]>();
 
   let devices: Devices[] = devices_data!;
 
   return (
     <div className="text-zinc-200 min-h-screen flex flex-col lg:flex-row py-2 sm:py-4 lg:py-6 gap-6">
-      <TimerView cues={cues} timerId={timerId} devices={devices} />
+      <TimerView cues={cues} sessionId={sessionId} devices={devices} />
     </div>
   )
 }

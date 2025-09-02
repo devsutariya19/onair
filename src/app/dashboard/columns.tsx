@@ -53,7 +53,7 @@ export const columns: ColumnDef<Session>[] = [
 
       return (
         <div className="flex justify-end">
-          <CopyLink timerId={row.original.id} />
+          <CopyLink sessionId={row.original.id} />
           <a href={`/t/${row.original.id}`} target="_blank" rel="noopener noreferrer">
             <Button variant='secondary'>
               Start <ArrowRight size={14} />

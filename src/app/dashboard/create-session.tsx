@@ -91,10 +91,7 @@ export default function CreateSession() {
   return (
     <Dialog onOpenChange={() => resetQueue()}>
         <DialogTrigger asChild>
-          <Button>
-            <Plus/>
-            Create New Session
-          </Button>
+          <Button variant="default"><Plus/> Create New Session</Button>
         </DialogTrigger>
         <DialogContent className="w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl">
           <DialogHeader>

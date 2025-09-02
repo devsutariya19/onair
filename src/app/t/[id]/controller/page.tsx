@@ -15,14 +15,14 @@ export const metadata: Metadata = {
 
 export default async function Controller({ params }: { params: Promise<{ id: string }>}) {
   const { id } = await params;
-  const timerId = id;
+  const sessionId = id;
 
   const supabase = await createClient();
 
   const {data: cue_data} = await supabase
     .from('cues')
     .select('*')
-    .eq('session_id', timerId)
+    .eq('session_id', sessionId)
     .order('order', { ascending: true })
     .overrideTypes<Cue[]>();
 
@@ -32,8 +32,6 @@ export default async function Controller({ params }: { params: Promise<{ id: str
   if (!hasActiveCue && cues.length > 0) {
     const firstCue = cues.find(cue => cue.order === 1);
 
-    console.log(`No active cue found. Activating '${firstCue?.title}'...`);
-
     await supabase
     .from('cues')
     .update({ status: 'active'})
@@ -42,19 +40,17 @@ export default async function Controller({ params }: { params: Promise<{ id: str
       const {data} = await supabase
         .from('cues')
         .select('*')
-        .eq('session_id', timerId)
+        .eq('session_id', sessionId)
         .order('order', { ascending: true })
         .overrideTypes<Cue[]>();
       cues = data!;
     })
   }
 
-  console.log(cues);
-
   const {data: devices_data} = await supabase
     .from('devices')
     .select('*')
-    .eq('session_id', timerId)
+    .eq('session_id', sessionId)
     .overrideTypes<Devices[]>();
 
   let devices: Devices[] = devices_data!;
@@ -62,7 +58,7 @@ export default async function Controller({ params }: { params: Promise<{ id: str
   const {data: messages_data} = await supabase
     .from('messages')
     .select('*')
-    .eq('session_id', timerId)
+    .eq('session_id', sessionId)
     .overrideTypes<Messages[]>();
 
   let messages: Messages[] = messages_data!;
@@ -78,12 +74,12 @@ export default async function Controller({ params }: { params: Promise<{ id: str
           </Link>
           <div>
             <h1 className="text-lg font-bold text-white">Host Dashboard</h1>
-            <p className="text-xs text-zinc-400">Timer ID: <span className="font-mono">{timerId}</span></p>
+            <p className="text-xs text-zinc-400">Timer ID: <span className="font-mono">{sessionId}</span></p>
           </div>
         </div>
           <div className="flex items-center gap-4">
           <LocalTime/>
-          <CopyLink timerId={timerId} icon={false}/>
+          <CopyLink sessionId={sessionId} icon={false}/>
         </div>
       </div>
       
@@ -91,7 +87,7 @@ export default async function Controller({ params }: { params: Promise<{ id: str
         cues={cues}
         messages={messages}
         devices={devices}
-        timerId={timerId}
+        sessionId={sessionId}
       />
     </div>
   );

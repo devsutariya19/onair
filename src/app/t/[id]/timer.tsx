@@ -10,7 +10,7 @@ import { createClient } from "@/utils/supabase/client";
 import { ArrowRight, ChartNoAxesGantt, Circle, Users, Wifi, WifiOff } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export function TimerView ({ cues, timerId, devices }: { cues: Cue[], timerId: string, devices: Devices[] }) {
+export function TimerView ({ cues, sessionId: sessionId, devices }: { cues: Cue[], sessionId: string, devices: Devices[] }) {
   const active: Cue = cues.find(c => c.status === 'active') || cues[0];
   const [activeCue, setActiveCue] = useState<Cue>(active);
   
@@ -23,7 +23,7 @@ export function TimerView ({ cues, timerId, devices }: { cues: Cue[], timerId: s
   const [hostMessage, setHostMessage] = useState('');
   
   const supabase = createClient();
-  const channel = supabase.channel(`session-${timerId}`);
+  const channel = supabase.channel(`session-${sessionId}`);
 
   useEffect(() => {
     channel.on('broadcast', { event: 'update' }, (data) => {
@@ -83,7 +83,7 @@ export function TimerView ({ cues, timerId, devices }: { cues: Cue[], timerId: s
               {isConnected ? <Wifi size={16} className="animate-pulse" /> : <WifiOff size={16} />}
               <span className="animate-pulse">{isConnected ? 'Live' : 'Offline'}</span>
             </div>
-            <CopyLink timerId={timerId} icon={false}/>
+            <CopyLink sessionId={sessionId} icon={false}/>
           </div>
         </div>
 

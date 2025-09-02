@@ -10,8 +10,9 @@ import { Label } from '@/components/ui/label';
 import { Cue, Devices, Messages } from '@/lib/model';
 import { createClient } from '@/utils/supabase/client';
 import { Progress } from '@/components/ui/progress';
+import NewMessage from './new-message';
 
-export default function HostDashboard({ cues, messages, timerId, devices }: { cues: Cue[], messages: Messages[], timerId: string, devices: Devices[] }) {
+export default function HostDashboard({ cues, messages, sessionId, devices }: { cues: Cue[], messages: Messages[], sessionId: string, devices: Devices[] }) {
   const [timeline, setTimeline] = useState<Cue[]>(cues);
 
   const [hostMessage, setHostMessage] = useState<string>('');
@@ -23,7 +24,7 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
   const [currentTime, setCurrentTime] = useState<number>(active.remaining_time || 0);
 
   const supabase = createClient();
-  const channel = supabase.channel(`session-${timerId}`);
+  const channel = supabase.channel(`session-${sessionId}`);
 
   useEffect(() => {
     if (!isPlaying || !activeCue) return;
@@ -60,7 +61,6 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
 
   const togglePlayPause = async () => {
     if (!activeCue) return;
-    console.log("Toggling play/pause...");
     await supabase
       .from('cues')
       .update({ is_playing: !isPlaying, remaining_time: currentTime })
@@ -81,7 +81,6 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
   };
 
   const handlePlay = async (id: string) => {
-    console.log("Playing cue:", id);
     const nextCue = timeline.find(c => c.id === id)!;
     await supabase
       .from('cues')
@@ -100,7 +99,6 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
 
   const handleNextCue = async () => {
     const nextCue = timeline.find(c => c.order === activeCue.order + 1);
-    console.log(nextCue);
 
     if (nextCue) {
       await supabase.from('cues').upsert([
@@ -115,7 +113,6 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
 
   const handlePreviousCue = async () => {
     const prevCue = timeline.find(c => c.order === activeCue.order - 1);
-    console.log(prevCue);
 
     if (prevCue) {
       await supabase.from('cues').upsert([
@@ -206,7 +203,7 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
             <CardTitle>Messages</CardTitle>
             <div className="flex items-center gap-2">
               {hostMessage && <Button variant="secondary" size="sm" onClick={() => setHostMessage('')}>Clear</Button>}
-              {/* <NewMessageDialog onSave={handleAddNewMessage} /> */}
+              <NewMessage sessionId={sessionId}/>
             </div>
           </CardHeader>
           <CardContent className="space-y-2 overflow-y-auto">
