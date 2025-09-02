@@ -20,7 +20,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 h-[88px] flex items-center">
       <div className="w-full max-w-7xl mx-auto px-6 transition-all duration-300 ease-in-out">
-        <div className={`flex justify-between items-center transition-all duration-300 ease-in-out border ${isScrolled ? 'py-2 px-6 bg-zinc-900/80 backdrop-blur-lg rounded-full border-zinc-700 shadow-xl' : 'py-4 px-0 bg-transparent rounded-none border-transparent border-b-zinc-800'}`}>
+        <div className={`flex justify-between items-center transition-all duration-300 ease-in-out border ${isScrolled ? 'py-2 px-6 bg-zinc-900/80 backdrop-blur-lg rounded-full border-zinc-700 shadow-xl' : 'py-6 px-0 bg-transparent rounded-none border-transparent border-b-zinc-800'}`}>
           <Link href="/" className="text-2xl font-bold text-teal-400 flex items-center gap-2">
             <ChartNoAxesGantt className="bg-teal-500 text-white rounded-full p-1" />
             OnAir Timer
@@ -44,7 +44,7 @@ export default function Navbar() {
         </div>
       </div>
       {isMenuOpen && (
-        <div className="absolute top-full left-0 w-full md:hidden bg-zinc-900 border-t border-zinc-800">
+        <div className="absolute top-full left-0 w-full md:hidden bg-zinc-900 rounded-3xl border-1 border-zinc-700">
           <nav className="flex flex-col items-center space-y-4 px-6 py-4">
             <Link href="#features" onClick={() => setIsMenuOpen(false)} className="text-gray-300 hover:text-teal-400 transition-colors text-lg">Features</Link>
             <Link href="#how-it-works" onClick={() => setIsMenuOpen(false)} className="text-gray-300 hover:text-teal-400 transition-colors text-lg">How It Works</Link>

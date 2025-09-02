@@ -25,17 +25,17 @@ export default function ControlDash({startTime}: {startTime: number}) {
         </div>
         <div className="bg-zinc-900 rounded-lg p-4 flex flex-col md:flex-row gap-4">
           <div className="flex-grow w-full bg-zinc-800/50 rounded-lg p-4 flex flex-col items-center justify-center text-center">
-            <h4 className="font-semibold text-3xl mb-10 text-gray-300">Queue</h4>
-            <ul className="text-lg w-5/6 space-y-2 text-gray-400">
-              <li className="truncate p-1 rounded-lg bg-teal-900/50 text-teal-300">Team Presentations : 25m</li>
+            <h4 className="font-semibold text-3xl mb-5 sm:mb-10 text-gray-300">Queue</h4>
+            <ul className="text-sm sm:text-lg w-5/6 space-y-2 text-gray-400">
+              <li className="truncate p-1 rounded-lg bg-teal-900/50 text-teal-300">Team Showcase : 25m</li>
               <li className="truncate">Keynote Speech : 5m</li>
               <li className="truncate">Q&A Session : 10m</li>
               <li className="truncate">Closing Remarks : 2m</li>
             </ul>
           </div>
-          <div className="flex md:flex-col gap-4 w-full md:w-56">
+          <div className="flex flex-col gap-4 w-full md:w-56">
             <div className="flex-1 text-center bg-zinc-800/50 rounded-lg p-3">
-              <p className="text-sm text-gray-400">Current: Team Presentations</p>
+              <p className="text-sm text-gray-400">Current: Team Showcase</p>
               <p className="font-mono text-2xl font-bold text-teal-300 my-2">{formatTime(mockupTime)}</p>
               <div className="w-full bg-zinc-700 h-1 rounded-full my-3">
                 <div className="bg-teal-500 h-1 rounded-full" style={{width: `${(mockupTime/startTime)*100}%`}}></div>

@@ -10,7 +10,6 @@ export default function Home() {
       <Navbar/>
       <main>
         <section className="py-20 md:py-32 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-grid-zinc-800/50 [mask-image:radial-gradient(ellipse_at_center,white_5%,transparent_70%)]"></div>
           <div className="px-6">
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-200 to-gray-400 mb-6 p-1">
               Keep Everyone Perfectly in Sync.
