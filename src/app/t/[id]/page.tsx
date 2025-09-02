@@ -1,7 +1,7 @@
 import React from 'react'
 import { TimerView } from '@/app/t/[id]/timer';
 import { Metadata } from 'next';
-import { Cue, Devices } from '@/lib/model';
+import { Cue, Devices, Session } from '@/lib/model';
 import { createClient } from '@/utils/supabase/server';
 
 export const metadata: Metadata = {
@@ -14,6 +14,15 @@ export default async function TimerPage({ params }: { params: Promise<{ id: stri
   const sessionId = id;
 
   const supabase = await createClient();
+
+  const {data: session_data} = await supabase
+    .from('sessions')
+    .select('*')
+    .eq('id', sessionId)
+    .single();
+
+  const session: Session = session_data!;
+  
   const {data} = await supabase
     .from('cues')
     .select('*')
@@ -33,7 +42,7 @@ export default async function TimerPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="text-zinc-200 min-h-screen flex flex-col lg:flex-row py-2 sm:py-4 lg:py-6 gap-6">
-      <TimerView cues={cues} sessionId={sessionId} devices={devices} />
+      <TimerView cues={cues} sessionId={sessionId} session={session} devices={devices} />
     </div>
   )
 }

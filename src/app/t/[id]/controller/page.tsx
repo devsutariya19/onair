@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import React from 'react'
 import HostDashboard from '@/app/t/[id]/controller/host-dashboard';
 import Link from 'next/link';
-import { Cue, Devices, Messages } from '@/lib/model';
+import { Cue, Devices, Messages, Session } from '@/lib/model';
 import { createClient } from '@/utils/supabase/server';
 
 export const metadata: Metadata = {
@@ -18,6 +18,14 @@ export default async function Controller({ params }: { params: Promise<{ id: str
   const sessionId = id;
 
   const supabase = await createClient();
+
+  const {data: session_data} = await supabase
+    .from('sessions')
+    .select('*')
+    .eq('id', sessionId)
+    .single();
+
+  const session: Session = session_data!;
 
   const {data: cue_data} = await supabase
     .from('cues')
@@ -73,7 +81,7 @@ export default async function Controller({ params }: { params: Promise<{ id: str
             </div>
           </Link>
           <div>
-            <h1 className="text-lg font-bold text-white">Host Dashboard</h1>
+            <h1 className="text-lg font-bold text-white">{session.title}</h1>
             <p className="text-xs text-zinc-400">Timer ID: <span className="font-mono">{sessionId}</span></p>
           </div>
         </div>

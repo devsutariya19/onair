@@ -4,13 +4,13 @@ import CopyLink from "@/components/copy-link";
 import LocalTime from "@/components/local-time";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Cue, Devices } from "@/lib/model";
+import { Cue, Devices, Session } from "@/lib/model";
 import { formatMinutes, formatTime } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { ArrowRight, ChartNoAxesGantt, Circle, Users, Wifi, WifiOff } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export function TimerView ({ cues, sessionId: sessionId, devices }: { cues: Cue[], sessionId: string, devices: Devices[] }) {
+export function TimerView ({ cues, sessionId, session, devices }: { cues: Cue[], sessionId: string, session: Session, devices: Devices[] }) {
   const active: Cue = cues.find(c => c.status === 'active') || cues[0];
   const [activeCue, setActiveCue] = useState<Cue>(active);
   
@@ -134,7 +134,7 @@ export function TimerView ({ cues, sessionId: sessionId, devices }: { cues: Cue[
       <div className="lg:w-1/3 flex flex-col gap-6">
         <Card className="flex flex-col flex-grow">
           <CardHeader>
-            <CardTitle>Timeline</CardTitle>
+            <CardTitle>{session.title} | Timeline</CardTitle>
           </CardHeader>
           <CardContent className="overflow-y-auto">
             <div className="space-y-3">
@@ -165,7 +165,7 @@ export function TimerView ({ cues, sessionId: sessionId, devices }: { cues: Cue[
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl text-zinc-300">{cues.find(c => c.order === activeCue.order + 1) ? cues.find(c => c.order === activeCue.order + 1)?.title : 'End of Event'}</p>
+              <p className="text-lg sm:text-xl text-zinc-300">{cues.find(c => c.order === activeCue.order + 1) ? cues.find(c => c.order === activeCue.order + 1)?.title : 'End of Event'}</p>
             </CardContent>
           </Card>
           <Card>

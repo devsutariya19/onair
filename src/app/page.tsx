@@ -11,8 +11,8 @@ export default function Home() {
       <main>
         <section className="py-20 md:py-32 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-grid-zinc-800/50 [mask-image:radial-gradient(ellipse_at_center,white_5%,transparent_70%)]"></div>
-          <div className="container mx-auto px-6 relative">
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-200 to-gray-400 mb-6">
+          <div className="px-6">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-200 to-gray-400 mb-6 p-1">
               Keep Everyone Perfectly in Sync.
             </h1>
             <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-400 mb-10">
@@ -131,13 +131,13 @@ export default function Home() {
 
         <section className="py-20">
           <div className="container mx-auto px-6">
-            <div className="bg-gradient-to-r from-teal-700 to-emerald-800 rounded-2xl p-10 md:p-16 text-center">
+            <div className="flex flex-col justify-center items-center bg-gradient-to-r from-teal-700 to-emerald-800 rounded-2xl p-10 md:p-16 text-center">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Run a Smoother Event?</h2>
               <p className="text-teal-200 max-w-2xl mx-auto mb-8">
                 Stop juggling clocks and start focusing on your content. Try OnAir Timer today and experience perfectly synchronized events.
               </p>
               <Link href="/dashboard">
-                <Button className='bg-white text-teal-700 hover:bg-gray-200 font-bold py-3 px-8 rounded-full transition-colors shadow-lg text-lg'>
+                <Button className='bg-white text-teal-700 hover:bg-gray-200 font-bold py-3 px-5 rounded-full transition-colors shadow-lg text-lg'>
                   Start Your First Timer
                 </Button>
               </Link>
