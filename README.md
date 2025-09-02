@@ -1,9 +1,17 @@
 # OnAir Stage Timer
 
-![In Progress](https://img.shields.io/badge/status-work%20in%20progress-yellow.svg)
-
 A real-time, remote timer application designed for managing live events, presentations, and workshops. OnAir provides a host with a comprehensive control center to manage an agenda, while client devices display a clean, synchronized timer view.
 
+### [OnAir Timer](https://onair-0tg9.onrender.com/)
+
+### Dashboard
+![Dashboard](public/OnAir-Dashboard.png)
+
+### Host Controller
+![Controller](public/OnAir-Controller.png)
+
+### Client View
+![Client View](public/OnAir-ClientView.png)
 
 ## Key Features
 
@@ -11,7 +19,6 @@ A real-time, remote timer application designed for managing live events, present
 * **Synchronized Client View:** A clean, full-screen timer display for client devices (laptops, tablets, phones) that stays in sync with the host.
 * **Interactive Agenda:** Hosts can click any item in the agenda to make it the active timer.
 * **Dynamic Visual Cues:** Hosts can send messages to client devices
-* **Overtime Tracking:** The timer seamlessly transitions from counting down to counting up once the time has expired.
 * **Broadcast Messaging:** The host can send short messages that appear on all connected client screens.
 
 ## Tech Stack
