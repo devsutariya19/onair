@@ -1,5 +1,6 @@
 'use client';
 
+import CopyLink from "@/components/copy-link";
 import LocalTime from "@/components/local-time";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -70,18 +71,19 @@ export function TimerView ({ cues, timerId, devices }: { cues: Cue[], timerId: s
   return (
     <>
       <div className="flex-grow lg:w-2/3 flex flex-col gap-6">
-        <div className="flex justify-between items-center">
-          <div className="text-2xl font-bold text-teal-400 flex items-center gap-2">
+        <div className="flex justify-between items-center py-2 sm:py-0">
+          <div className="text-xl sm:text-2xl font-bold text-teal-400 flex items-center gap-2">
             <ChartNoAxesGantt className="bg-teal-500 text-white rounded-full p-1" />
             OnAir Timer
           </div>
           <div className="flex items-center gap-4">
             <LocalTime />
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${isConnected ? 'bg-teal-500/10 text-teal-400' : 'bg-red-500/10 text-red-400'}`}
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs sm:text-sm ${isConnected ? 'bg-teal-500/10 text-teal-400' : 'bg-red-500/10 text-red-400'}`}
               title={isConnected ? 'Connected to host' : 'Connection lost'}>
               {isConnected ? <Wifi size={16} className="animate-pulse" /> : <WifiOff size={16} />}
               <span className="animate-pulse">{isConnected ? 'Live' : 'Offline'}</span>
             </div>
+            <CopyLink timerId={timerId} icon={false}/>
           </div>
         </div>
 
@@ -93,8 +95,8 @@ export function TimerView ({ cues, timerId, devices }: { cues: Cue[], timerId: s
             <div className="font-mono font-bold tracking-tighter text-white transition-all duration-500 text-7xl sm:text-8xl md:text-9xl md:my-10">
               {formatTime(currentTime)}
             </div>
-            <div className={`px-5 py-2 mt-2 rounded-full font-semibold transition-all duration-500 ${isPlaying ? 'bg-yellow-500/10 text-teal-300' : 'bg-teal-500/10 text-yellow-300'} ${hostMessage ? 'text-sm' : 'text-md'}`}>
-              {isPlaying ? 'RUNNING' : 'PAUSED'}
+            <div className={`px-5 py-2 mt-2 rounded-full font-semibold transition-all duration-500 ${isPlaying ? 'bg-teal-500/10 text-teal-300' : 'bg-amber-500/10 text-amber-300'} ${hostMessage ? 'text-sm' : 'text-md'}`}>
+              {isPlaying ? 'IN PROGRESS' : 'PAUSED'}
             </div>
             <div className={`transition-all duration-500 ease-in-out w-full ${hostMessage ? 'mt-8 pt-10 border-t border-zinc-700' : 'mt-0 pt-0 border-t border-transparent'}`}>
               <div className="flex flex-col gap-4 items-center text-center">

@@ -8,8 +8,15 @@ export type Cue = {
   status: 'active' | 'queued' | 'completed';
   is_playing: boolean;
   order: number;
-  created_at: string;
-  last_modified: string;
+  created_at?: string;
+  last_modified?: string;
+};
+
+export type NewCue = {
+  title: string;
+  speaker: string;
+  duration: string;
+  order: number;
 };
 
 export type Session = {

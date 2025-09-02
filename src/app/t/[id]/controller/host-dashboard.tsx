@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatTime, formatTotalTime } from '@/lib/utils';
+import { formatTime, formatTotalTimeDisplay } from '@/lib/utils';
 import { SkipBack, Play, Pause, SkipForward, Users } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import Timeline from '@/app/t/[id]/controller/timeline';
@@ -12,7 +12,7 @@ import { createClient } from '@/utils/supabase/client';
 import { Progress } from '@/components/ui/progress';
 
 export default function HostDashboard({ cues, messages, timerId, devices }: { cues: Cue[], messages: Messages[], timerId: string, devices: Devices[] }) {
-  const [timeline, setTimeline] = useState<Cue[]>(cues.sort((a, b) => a.order - b.order));
+  const [timeline, setTimeline] = useState<Cue[]>(cues);
 
   const [hostMessage, setHostMessage] = useState<string>('');
   const [screenState, setScreenState] = useState<'normal' | 'flashing' | 'blackout'>('normal');
@@ -130,8 +130,7 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
 
   const adjustTime = async (seconds: number) => {
     if (!activeCue) return;
-    // cap out at the activeCue.duration allocated
-    const newTime = Math.max(0, currentTime + seconds);
+    const newTime = Math.max(0, Math.min(currentTime + seconds, activeCue.duration));
     await supabase
       .from('cues')
       .update({ remaining_time: newTime })
@@ -150,7 +149,9 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
               <div className={`flex flex-col items-center justify-center gap-2 text-center transition-all duration-500 ease-in-out ${hostMessage ? 'opacity-70' : 'opacity-100'}`}>
                 <h2 className={`transition-all duration-500 flash-invert ${hostMessage ? 'text-md' : 'text-lg'} text-zinc-400`}>{activeCue?.title || 'Timer Finished'}</h2>
                 <div className={`font-mono font-bold tracking-tighter transition-all duration-500 flash-invert text-4xl ${hostMessage ? 'sm:text-3xl' : 'sm:text-4xl'} text-white`}>{formatTime(currentTime)}</div>
-                <div className={`px-3 py-1 mt-2 rounded-full font-semibold transition-all duration-500 ${isPlaying ? 'bg-yellow-500/10 text-teal-300' : 'bg-teal-500/10 text-yellow-300'} ${hostMessage ? 'text-xs' : 'text-sm'}`}>{isPlaying ? 'RUNNING' : 'PAUSED'}</div>
+                <div className={`px-3 py-1 mt-2 rounded-full font-semibold transition-all duration-500 ${isPlaying ? 'bg-teal-500/10 text-teal-300' : 'bg-amber-500/10 text-amber-300'} ${hostMessage ? 'text-xs' : 'text-sm'}`}>
+                  {isPlaying ? 'IN PROGRESS' : 'PAUSED'}
+                </div>
               </div>
               <div className={`transition-all duration-500 ease-in-out overflow-hidden w-full ${hostMessage ? 'max-h-[30rem] mt-4 pt-4 border-t border-zinc-700' : 'max-h-0 mt-0 pt-0 border-t border-transparent'}`}>
                 <div className="flex flex-col gap-2 items-center text-center">
@@ -189,7 +190,7 @@ export default function HostDashboard({ cues, messages, timerId, devices }: { cu
         <Card className="bg-zinc-900/70 border-zinc-700 text-white flex-grow flex flex-col">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Timeline</CardTitle>
-            <Label className="text-xs text-zinc-400">{timeline.length} items | {formatTotalTime(timeline.reduce((acc, item) => acc + item.duration, 0))}</Label>
+            <Label className="text-xs text-zinc-400">{timeline.length} items | {formatTotalTimeDisplay(timeline.reduce((acc, item) => acc + item.duration, 0))}</Label>
           </CardHeader>
           <CardContent className="flex-grow overflow-y-auto">
             <div className="space-y-1">

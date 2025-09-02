@@ -19,6 +19,7 @@ export default async function Dashboard() {
   const {data} = await supabase
     .from('sessions')
     .select('*')
+    .order('last_modified', { ascending: false })
     .overrideTypes<Session[]>();
 
   const sessions: Session[] = data!;
@@ -37,7 +38,7 @@ export default async function Dashboard() {
           </Button>
         </Link>
       </div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4 mx-10">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4 mx-0 sm:mx-10">
         <div>
           <h1 className="text-3xl font-bold text-zinc-100">My Sessions</h1>
           <p className="text-zinc-400 mt-1">Manage and create your remote timers.</p>

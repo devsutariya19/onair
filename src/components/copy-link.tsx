@@ -23,10 +23,10 @@ export default function CopyLink({ timerId, icon = true }: { timerId: string, ic
     <div>
       <Button variant={icon ? 'ghost' : 'secondary'} onClick={handleCopy} className=" text-zinc-500">
         {icon ? (
-          copied ? <Check size={16} className="text-teal-400"/> : <Copy size={16}/>
+          copied ? <Check className="text-teal-400"/> : <Copy/>
         ) : (
           <>
-            {copied ? <Check size={16} className="text-teal-300"/> : <Link size={16} className="text-zinc-300"/>}
+            {copied ? <Check className="text-teal-300"/> : <Link className="text-zinc-300"/>}
             <span className="text-zinc-300 hidden sm:block">Share Link</span>
           </>
         )}

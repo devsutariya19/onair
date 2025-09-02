@@ -23,6 +23,7 @@ export default async function Controller({ params }: { params: Promise<{ id: str
     .from('cues')
     .select('*')
     .eq('session_id', timerId)
+    .order('order', { ascending: true })
     .overrideTypes<Cue[]>();
 
   let cues: Cue[] = cue_data!;
@@ -42,6 +43,7 @@ export default async function Controller({ params }: { params: Promise<{ id: str
         .from('cues')
         .select('*')
         .eq('session_id', timerId)
+        .order('order', { ascending: true })
         .overrideTypes<Cue[]>();
       cues = data!;
     })

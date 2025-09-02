@@ -1,8 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Users } from 'lucide-react';
 import React from 'react'
 import { TimerView } from '@/app/t/[id]/timer';
-import { formatMinutes } from '@/lib/utils';
 import { Metadata } from 'next';
 import { Cue, Devices } from '@/lib/model';
 import { createClient } from '@/utils/supabase/server';
@@ -21,9 +18,10 @@ export default async function TimerPage({ params }: { params: Promise<{ id: stri
     .from('cues')
     .select('*')
     .eq('session_id', timerId)
+    .order('order', { ascending: true })
     .overrideTypes<Cue[]>();
 
-  const cues: Cue[] = data!.sort((a, b) => a.order - b.order);
+  const cues: Cue[] = data!;
 
   const {data: devices_data} = await supabase
     .from('devices')

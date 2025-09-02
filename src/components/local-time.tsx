@@ -29,7 +29,7 @@ export default function LocalTime() {
       {currentLocalTime && (
         <div className="flex items-center gap-2 text-zinc-400">
           <Clock size={18} />
-          <span className="font-mono text-lg">{currentLocalTime}</span>
+          <span className="font-mono text-sm sm:text-lg">{currentLocalTime}</span>
         </div>
       )}
     </div>
